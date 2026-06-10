@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biochemical Signaling · Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #e8ecf0;
+    --surface:   #f0f3f6;
+    --card:      #f5f7f9;
+    --border:    #c8d2dc;
+    --accent:    #7a96aa;
+    --accent2:   #5e7d8f;
+    --text:      #3a4a55;
+    --muted:     #7a8e98;
+    --correct:   #7aaa8a;
+    --wrong:     #c08080;
+    --correct-bg:#e8f3ec;
+    --wrong-bg:  #f5e8e8;
+    --shadow:    rgba(90,120,140,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Serif TC', serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── Header ─── */
+  header {
+    background: linear-gradient(135deg, #4d6e80 0%, #6b8fa3 60%, #8baab8 100%);
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  header h1 {
+    font-family: 'Lora', serif;
+    font-size: 2rem;
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: .04em;
+    position: relative;
+  }
+  header p {
+    color: rgba(255,255,255,.75);
+    margin-top: .5rem;
+    font-size: .9rem;
+    font-weight: 300;
+    position: relative;
+  }
+
+  /* ─── Controls ─── */
+  .controls {
+    max-width: 860px;
+    margin: 1.5rem auto;
+    padding: 0 1.2rem;
+    display: flex;
+    gap: .8rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .controls label {
+    font-size: .82rem;
+    color: var(--muted);
+    letter-spacing: .03em;
+  }
+  select, button {
+    font-family: 'Noto Serif TC', serif;
+    font-size: .88rem;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    padding: .45rem .9rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  select:hover, select:focus { border-color: var(--accent); outline: none; }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    font-weight: 500;
+    padding: .5rem 1.4rem;
+  }
+  .btn-primary:hover { background: var(--accent2); border-color: var(--accent2); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--accent2);
+    border-color: var(--accent);
+  }
+  .btn-ghost:hover { background: var(--accent); color: #fff; }
+
+  /* ─── Stats bar ─── */
+  .stats {
+    max-width: 860px;
+    margin: 0 auto .5rem;
+    padding: 0 1.2rem;
+    display: flex;
+    gap: 1rem;
+    font-size: .82rem;
+    color: var(--muted);
+  }
+  .stats span b { color: var(--text); }
+
+  /* ─── Question list ─── */
+  #quiz-container {
+    max-width: 860px;
+    margin: 0 auto 3rem;
+    padding: 0 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+  }
+
+  /* ─── Card ─── */
+  .q-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 1.4rem 1.6rem;
+    box-shadow: 0 2px 12px var(--shadow);
+    transition: box-shadow .2s;
+    position: relative;
+  }
+  .q-card:hover { box-shadow: 0 4px 20px var(--shadow); }
+
+  .q-meta {
+    display: flex;
+    gap: .6rem;
+    margin-bottom: .7rem;
+    align-items: center;
+  }
+  .q-num {
+    background: var(--accent);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: .18rem .5rem;
+    letter-spacing: .04em;
+  }
+  .q-chapter {
+    font-size: .72rem;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: .15rem .5rem;
+    letter-spacing: .03em;
+  }
+
+  .q-text {
+    font-size: .98rem;
+    line-height: 1.75;
+    margin-bottom: 1rem;
+    font-weight: 400;
+  }
+
+  /* ─── Options ─── */
+  .options { display: flex; flex-direction: column; gap: .55rem; }
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: .7rem;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    padding: .7rem 1rem;
+    cursor: pointer;
+    transition: all .18s;
+    font-size: .9rem;
+    line-height: 1.5;
+    text-align: left;
+  }
+  .opt:hover:not(.disabled) {
+    border-color: var(--accent);
+    background: #e4edf3;
+  }
+  .opt-letter {
+    flex-shrink: 0;
+    width: 1.5rem; height: 1.5rem;
+    border-radius: 50%;
+    background: var(--border);
+    color: var(--muted);
+    font-size: .75rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .18s;
+  }
+  .opt:hover:not(.disabled) .opt-letter { background: var(--accent); color: #fff; }
+  .opt.correct {
+    background: var(--correct-bg);
+    border-color: var(--correct);
+  }
+  .opt.correct .opt-letter { background: var(--correct); color: #fff; }
+  .opt.wrong {
+    background: var(--wrong-bg);
+    border-color: var(--wrong);
+  }
+  .opt.wrong .opt-letter { background: var(--wrong); color: #fff; }
+  .opt.disabled { cursor: default; }
+  .opt.highlight-correct {
+    background: var(--correct-bg);
+    border-color: var(--correct);
+  }
+  .opt.highlight-correct .opt-letter { background: var(--correct); color: #fff; }
+
+  /* ─── Explanation ─── */
+  .explanation {
+    display: none;
+    margin-top: 1rem;
+    padding: 1rem 1.1rem;
+    background: linear-gradient(135deg, #dce8f0, #e6eff5);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    font-size: .88rem;
+    line-height: 1.8;
+    color: var(--text);
+    animation: fadeIn .3s ease;
+  }
+  .explanation.show { display: block; }
+  .explanation .exp-title {
+    font-weight: 700;
+    color: var(--accent2);
+    margin-bottom: .4rem;
+    font-size: .85rem;
+    letter-spacing: .04em;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── Result badge ─── */
+  .result-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    font-size: .78rem;
+    font-weight: 600;
+    padding: .2rem .6rem;
+    border-radius: 20px;
+    margin-left: auto;
+  }
+  .badge-correct { background: var(--correct-bg); color: #4e8060; }
+  .badge-wrong   { background: var(--wrong-bg);   color: #9a5555; }
+
+  /* ─── Empty state ─── */
+  #empty {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: var(--muted);
+    font-size: 1rem;
+  }
+
+  /* ─── Score summary ─── */
+  #score-bar {
+    max-width: 860px;
+    margin: 0 auto 1.2rem;
+    padding: 0 1.2rem;
+  }
+  .score-card {
+    background: linear-gradient(135deg, #5b7f95, #7aa0b5);
+    border-radius: 12px;
+    padding: 1.1rem 1.6rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    color: #fff;
+  }
+  .score-card .sc-num {
+    font-family: 'Lora', serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .score-card .sc-label { font-size: .82rem; opacity: .85; }
+  .score-card .sc-bar-wrap {
+    flex: 1;
+    min-width: 120px;
+    background: rgba(255,255,255,.25);
+    border-radius: 99px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .score-card .sc-bar {
+    height: 100%;
+    background: #fff;
+    border-radius: 99px;
+    transition: width .6s ease;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Biochemical Signaling Quiz</h1>
+  <p>點選選項後查看中文詳解 · Select an answer to see the Chinese explanation</p>
+</header>
+
+<div class="controls">
+  <label>章節篩選：</label>
+  <select id="chapter-filter">
+    <option value="all">全部題目</option>
+    <option value="ch82">生化82 — Chapter 13: Biochemical Signaling</option>
+    <option value="ch81">生化81 — Chapter 8: Textbook</option>
+  </select>
+  <button class="btn-primary" onclick="resetAll()">↺ Reset</button>
+</div>
+
+<div id="score-bar" style="display:none">
+  <div class="score-card">
+    <div>
+      <div class="sc-num" id="sc-num">0/0</div>
+      <div class="sc-label">Correct / Answered</div>
+    </div>
+    <div class="sc-bar-wrap"><div class="sc-bar" id="sc-bar" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="stats">
+  <span>Showing: <b id="showing-count">0</b> questions</span>
+  <span>Answered: <b id="answered-count">0</b></span>
+</div>
+
+<div id="quiz-container"></div>
+<div id="empty" style="display:none">此章節暫無題目。</div>
+
+<script>
+// ── Question Bank ────────────────────────────────────────────────
+const ALL_QUESTIONS = [
+  // ── 生化82 / Chapter 13 ──────────────────────────────────────
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Insulin binds to a receptor that\nI. is coupled to a G protein.\nII. possesses tyrosine kinase activity.\nIII. possesses serine/threonine phosphatase activity.\nIV. interacts with proteins homologous to Src',
+    opts:['A) I, II, III','B) II only','C) I, III','D) II, IV','E) I, IV'],
+    ans:3,
+    exp:'胰島素受體是受體酪胺酸激酶（RTK），具有內在酪胺酸激酶活性（II ✓），活化後磷酸化 IRS-1/2 等含 SH2 域蛋白，這些蛋白在結構上與 Src 同源（IV ✓）。胰島素受體不與異三聚體 G 蛋白偶聯（I ✗），也不具磷酸酶活性（III ✗）。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Which of the following proteins is a phosphatase activated by Ca²⁺ essential for T cell proliferation?',
+    opts:['A) Calcineurin','B) Calmodulin (CaM)','C) Rhodopsin','D) RasGAP','E) MAPK'],
+    ans:0,
+    exp:'鈣調磷酸酶（calcineurin）是由 Ca²⁺/鈣調蛋白活化的磷酸酶，能去磷酸化轉錄因子 NFAT，使其進入細胞核，啟動 T 細胞增殖所需的基因表現。鈣調蛋白（calmodulin）本身是 Ca²⁺ 感測蛋白，並非磷酸酶。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'The ability of receptors to adapt to long-term stimulation by responding to changes in stimulation levels rather than absolute values of stimulation is called',
+    opts:['A) Dual-specificity','B) Intrasteric sensitivity','C) Autoinhibition','D) Desensitization','E) Switch regional detection'],
+    ans:3,
+    exp:'去敏感化（desensitization）是指受體在持續刺激下，對刺激的響應能力逐漸降低的現象。細胞對刺激量的「改變」比對絕對濃度更敏感，讓細胞得以在寬廣範圍內適應不同訊號強度。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Cancer causing viruses often contain:\nI. oncogenes.\nII. genes encoding variant proteins.\nIII. genes encoding cell proliferation inhibitors.\nIV. genes capable of inducing malignant transformation.',
+    opts:['A) I only','B) III only','C) IV only','D) I, II, IV','E) I, II, III, IV'],
+    ans:3,
+    exp:'致癌病毒通常攜帶：致癌基因（I）；編碼功能異常蛋白的基因（II）；能直接誘發惡性轉型的基因（IV）。它們一般不攜帶抑制細胞增殖的基因（III ✗）。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'The interaction (cross-talk) of various signaling pathways',
+    opts:['A) Allows for dual-specificity within different cell types','B) Is necessary for effective signal transduction','C) Occurs during autoinhibition of a pathway','D) Accounts for the ability of a signaling pathway to undergo desensitization','E) Can be minimized by scaffold proteins'],
+    ans:4,
+    exp:'支架蛋白（scaffold proteins）能將同一路徑的多個組分集中在一起，形成專屬的訊號複合體，避免不同路徑之間蛋白隨意互作，從而減少路徑間的「串音」（cross-talk），確保訊號的特異性。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Phospholipase C cleaves PIP₂, resulting in an increased cytosolic concentration of\nI. IP₃ (inositolpolyphosphate-3)\nII. protein kinase C\nIII. cAMP\nIV. Ca²⁺',
+    opts:['A) I only','B) II only','C) I, III','D) I, IV','E) IV only'],
+    ans:3,
+    exp:'PLC 將 PIP₂ 裂解為 DAG 和 IP₃。IP₃（I）直接增加細胞質中的 IP₃ 濃度，並促進 ER 釋放 Ca²⁺（IV）。PKC 需要 DAG 和 Ca²⁺ 才能活化，但其本身並非直接產物（II ✗）。cAMP 由腺苷酸環化酶合成，與此路徑無關（III ✗）。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'The cells of the islets of Langerhans secrete _____ in response to _____ glucose levels in the muscle and/or adipose tissue.',
+    opts:['A) Insulin; low','B) Insulin; elevated','C) Glucagon; low','D) Glucagon; elevated','E) Somatostatin; elevated'],
+    ans:1,
+    exp:'飯後血糖升高時，胰臟 β 細胞感測到血糖上升，分泌胰島素（insulin）。胰島素作用於肌肉和脂肪組織，促進葡萄糖攝取與儲存，使血糖恢復正常水準。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'The alpha cells of the islets of Langerhans secrete _____ in response to _____ glucose levels in the liver.',
+    opts:['A) Insulin; low','B) Insulin; elevated','C) Glucagon; low','D) Glucagon; elevated','E) Somatostatin; elevated'],
+    ans:2,
+    exp:'空腹或血糖偏低時，胰臟 α 細胞感測到低血糖，分泌升糖素（glucagon）。升糖素作用於肝臟，促進糖原分解與糖質新生，使血糖上升。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Heterotrimeric G proteins\nI. consist of three subunits, Gα, Gβ, and Gγ.\nII. function as an autoinhibitory segment.\nIII. can function as a mediator to adenylate cyclase activity.\nIV. are anchored to the cytoplasmic side of the membrane.',
+    opts:['A) I, II, IV','B) I, III, IV','C) I, IV','D) I, III','E) I only'],
+    ans:1,
+    exp:'G 蛋白由 Gα、Gβ、Gγ 三個亞基組成（I ✓）；透過脂肪醯基化錨定於細胞膜內側（IV ✓）；Gα 可活化或抑制腺苷酸環化酶（III ✓）。G 蛋白本身不作為自我抑制片段（II ✗）。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'The insulin signaling pathway includes which of the following steps?',
+    opts:['A) Ligand-induced dimerization of the receptor and phosphorylation of IRS-1 and/or IRS-2','B) Autophosphorylation and phosphorylation of IRS-1 and/or IRS-2 proteins','C) IRS-1-induced dimerization of the receptor, autophosphorylation, and phosphorylation of SH2 domains','D) Autophosphorylation and dephosphorylation of IRS-1 and/or SH2 domains','E) None of the above'],
+    ans:1,
+    exp:'胰島素與預先形成的 α₂β₂ 二聚體受體結合 → β 亞基酪胺酸自磷酸化 → 激酶活性增強 → 磷酸化接合蛋白 IRS-1/2，進而招募 SH2 域蛋白啟動下游路徑（如 PI3K、MAPK）。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Which of the following is (are) an advantage(s) of protein phosphorylation in regards to biochemical signaling?\nI. Phosphorylation is rapid and specific.\nII. Phosphorylation is enzymatically reversible.\nIII. Phosphorylation can be amplified by cascade systems.\nIV. Phosphorylation results in covalent modification of enzymes.',
+    opts:['A) I, II, III, IV','B) II, III, IV','C) II, III','D) I, II','E) III only'],
+    ans:0,
+    exp:'蛋白磷酸化的四大優點：① 快速且高度專一（I）；② 可由磷酸酶逆轉（II）；③ 可在激酶級聯中放大訊號（III）；④ 屬共價修飾，能改變蛋白活性（IV）。四點全部正確。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Which of the following is (are) the result of insulin binding to its receptor?\nI. MAPK activation, which regulates gene expression via Fos, Jun and Myc.\nII. PI3K activation leading to an increase in glucose transport.\nIII. High affinity binding of SH2 domains to phosphorylated tyrosines.\nIV. Autophosphorylation resulting in activation of tyrosine kinase.',
+    opts:['A) II, III, IV','B) I, II, III, IV','C) II, III','D) I, II','E) III only'],
+    ans:1,
+    exp:'胰島素結合後：β 亞基自磷酸化，活化酪胺酸激酶（IV）；磷酸化酪胺酸招募含 SH2 域蛋白（III）；PI3K 活化促進 GLUT4 膜融合（II）；Ras-MAPK 路徑活化調控 Fos/Jun/Myc（I）。四項全部正確。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Ras is an example of\nI. a protein anchored by prenylation.\nII. a heterotrimeric G protein.\nIII. a kinase activated protein.\nIV. a GTP dependent protein.',
+    opts:['A) I, II, III, IV','B) I, III, IV','C) I, III','D) II, III, IV','E) IV only'],
+    ans:1,
+    exp:'Ras 是單體 GTPase（小 G 蛋白），非異三聚體 G 蛋白（II ✗）。Ras 透過法尼基（farnesyl）異戊烯化修飾錨定於細胞膜（I ✓）；在 GTP 結合狀態下活化，激活 Raf 啟動 MAPK 級聯（III、IV ✓）。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Somatostatin\nI. inhibits the release of insulin.\nII. inhibits the release of glucagon.\nIII. stimulates the release of insulin.\nIV. stimulates the release of glucagon.',
+    opts:['A) I only','B) II only','C) I and II','D) III and IV','E) IV only'],
+    ans:2,
+    exp:'體抑素（somatostatin）由胰島 δ 細胞（及下視丘）分泌，可同時抑制 β 細胞分泌胰島素和 α 細胞分泌升糖素，扮演局部旁分泌調節角色，避免血糖調節過度波動。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Catecholamines mediate their effects through\nI. α-adrenoreceptors.\nII. β-adrenoreceptors.\nIII. receptor tyrosine kinases.\nIV. monomeric G protein receptors.',
+    opts:['A) I only','B) II only','C) I and II','D) III and IV','E) IV only'],
+    ans:2,
+    exp:'兒茶酚胺（如腎上腺素、正腎上腺素）透過 α 和 β-腎上腺素受體發揮作用，兩者均屬 GPCR（G 蛋白偶聯受體），不涉及酪胺酸激酶（III ✗）或單體 G 蛋白受體（IV ✗）。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Which of the following hormones functions by binding to receptors that function directly as transcription factors?',
+    opts:['A) Steroids','B) Insulin','C) Epinephrine','D) Glucagon','E) Somatostatin'],
+    ans:0,
+    exp:'類固醇激素因具脂溶性，可穿透細胞膜進入細胞，與核受體結合。結合後，受體本身即作為轉錄因子，直接結合特定 DNA 序列（HRE），調控目標基因的表現。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Which of the following are produced in the adrenal cortex?\nI. Glucocorticoids\nII. Mineralcorticoids\nIII. Androgens\nIV. Estrogens',
+    opts:['A) I only','B) I, II','C) II only','D) II, IV','E) I, II, III, IV'],
+    ans:4,
+    exp:'腎上腺皮質（3 層）合成所有類別的類固醇激素：絲球帶合成礦物皮質素（醛固酮）；束狀帶合成糖皮質素（皮質醇）；網狀帶合成雄性激素。四種均可在腎上腺皮質中找到。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Which of the following proteins has a structural motif called an "EF hand"?',
+    opts:['A) Insulin','B) Calmodulin (CaM)','C) Receptor tyrosine kinases (RTK)','D) cAMP-dependent protein kinase','E) Scaffold proteins'],
+    ans:1,
+    exp:'鈣調蛋白（calmodulin, CaM）含有 4 個「EF 手型」（helix-loop-helix）結構域，每個可結合一個 Ca²⁺ 離子。Ca²⁺ 結合後引起構型變化，暴露疏水性區域，進而活化多種 CaM 依賴性激酶和磷酸酶（如 calcineurin）。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Which of the following is (are) associated with cAMP binding to cAMP-dependent protein kinase A?\nI. cAMP binds to the regulatory subunits.\nII. Tetrameric regulatory subunits and catalytic subunits dissociate.\nIII. Catalytic subunits phosphorylate multiple targets with specific serine and threonine residues.\nIV. cAMP is membrane bound via phosphoinositol attachment.',
+    opts:['A) I, II, III, IV','B) I, II, III','C) I, II','D) II, III, IV','E) III, IV'],
+    ans:1,
+    exp:'PKA 靜息為 R₂C₂ 四聚體。cAMP 與 R 亞基結合（I ✓）→ R 與 C 亞基解離（II ✓）→ 游離 C 亞基在 Ser/Thr 殘基上磷酸化靶蛋白（III ✓）。cAMP 不與膜結合（IV ✗）。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Which of the following statements concerning the action of G proteins on adenylate cyclase is true?\nI. G proteins always serve to activate adenylate cyclase.\nII. G proteins always serve to inhibit adenylate cyclase.\nIII. Some G proteins activate adenylate cyclase, while others inhibit it.\nIV. G proteins do not act on adenylate cyclase at all.',
+    opts:['A) I only','B) II, III','C) I, III','D) II only','E) III only'],
+    ans:4,
+    exp:'G 蛋白對腺苷酸環化酶的作用取決於 Gα 亞型：Gsα 活化 AC，增加 cAMP；Giα 抑制 AC，降低 cAMP。同一細胞可因不同受體活化不同 G 蛋白，產生相反效果。故「有些活化，有些抑制」（III ✓）。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Which of the following increases the affinity of SH2 binding to phospho-tyrosine?',
+    opts:['A) The absence of a Ser or Thr residue in the binding region','B) The presence of an Arg residue deep in the binding pocket','C) The presence of an Arg residue near the binding pocket entrance','D) The absence of a Ser residue deep in the binding pocket','E) None of the above'],
+    ans:1,
+    exp:'SH2 域與磷酸酪胺酸的結合依賴靜電互作。結合口袋深處帶正電的 Arg 殘基能與磷酸根（帶負電）形成穩定鹽橋，顯著增加結合親和力，同時 +1 至 +3 位置的殘基提供序列特異性。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Scaffold proteins limit',
+    opts:['A) Oncogene transfer','B) MAPK activity','C) Cross-talk','D) Cell differentiation','E) Signal amplification'],
+    ans:2,
+    exp:'支架蛋白將同一路徑的多個訊號蛋白聚集為專屬複合體，一方面確保訊號精準傳遞，另一方面防止不相關蛋白的隨機互作，從而限制不同路徑之間的「交叉對話」（cross-talk）。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Which of the following best describes the mechanism of calmodulin (CaM) mediated activation?',
+    opts:['A) Ca²⁺ binding to CaM results in a conformational change that exposes a hydrophobic patch capable of binding to calcium sensitive protein kinase','B) A conformational change induced by Ca²⁺ binding results in the release of the phosphate group in CaM','C) CaM sensitive protein kinase dimerizes forming a joint active site capable of tightly binding Ca²⁺','D) Phosphorylation of a tyrosine on CaM induces a conformational change that results in release of Ca²⁺ from the cytosol','E) None of the above'],
+    ans:0,
+    exp:'靜息狀態的 CaM 呈「啞鈴形」。當 4 個 EF 手型結合 Ca²⁺ 後，整體構型改變，暴露出疏水性口袋（hydrophobic patch），使 CaM 能與靶蛋白（如 CaM 激酶 II）的結合域緊密互作，進而活化該蛋白。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Which of the following describes the similarity between: DAG, cAMP, IP₃',
+    opts:['A) All of them induce conformational changes in PKA','B) All of them activate adenylate cyclase','C) All of them require phosphorylation in order to function','D) All of them function as second messengers','E) All of them result from the activity of phosphoprotein lipase'],
+    ans:3,
+    exp:'DAG（二醯甘油）、cAMP（環腺苷酸）和 IP₃（肌醇三磷酸）均屬細胞內第二訊使：DAG 活化 PKC；cAMP 活化 PKA；IP₃ 促進 ER 釋放 Ca²⁺。三者各自由不同酵素產生。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Sildenafil (Viagra®)',
+    opts:['A) Inhibits activity of a phosphoprotein phosphatase','B) Increases the relative concentration of cGMP','C) Increases the relative concentration of nitric oxide in the blood','D) A, B, and C','E) A and B'],
+    ans:1,
+    exp:'威而鋼抑制 PDE5（磷酸二酯酶-5），使 cGMP 積累，活化 PKG，導致血管平滑肌舒張，增加陰莖血流。威而鋼不直接產生 NO（C ✗）或作用於磷酸酶（A ✗）。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Which of the following correctly states an essential step in the function of heterotrimeric G protein?',
+    opts:['A) A cascade of events must occur that ultimately activate protein kinase C','B) Binding of a hormone to a receptor must signal the exchange of GDP for GTP','C) Binding of GTP to the receptor protein must induce a change in conformation of the receptor','D) Binding of cAMP to the α subunit of the G protein must initiate translocation of the subunit','E) All of the above are correct'],
+    ans:1,
+    exp:'G 蛋白活化的核心步驟：配體結合 GPCR → 受體構型改變 → 催化 Gα 亞基上的 GDP 替換為 GTP → Gα-GTP 從 Gβγ 解離 → 各自活化下游效應子（如 AC、PLC）。GDP→GTP 交換由活化的受體本身（作為 GEF）催化，是整個路徑的關鍵觸發步驟。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Which of the following activities would lead to a decrease in the level of IP₃ in the cytosol?',
+    opts:['A) Increased activity of inositol polyphosphate 5-phosphatase','B) Increased activity of phospholipase C','C) Increased activation of protein kinase C','D) Increased Ca²⁺ concentration','E) All of the above'],
+    ans:0,
+    exp:'IP₃ 由磷脂酶 C 合成，並由肌醇多磷酸磷酸酶分解。增加肌醇多磷酸 5-磷酸酶（IP5P）活性，可加速 IP₃ 的去磷酸化降解，降低 IP₃ 水準（A ✓）。增加 PLC 活性（B）反而增加 IP₃。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Anthrax toxin functions by altering levels of cAMP. The toxin also contains an edema factor, which requires the activity of calmodulin (CaM) for proper function. Based on this information, which of the following can you conclude?',
+    opts:['A) The toxin alters cAMP dependent cell signaling','B) Calcium levels affect the function of the edema factor','C) Unlike other toxins, the anthrax toxin does not function by altering biochemical signaling','D) A and B','E) A and C'],
+    ans:3,
+    exp:'炭疽毒素中的水腫因子是一種腺苷酸環化酶，能大幅提升 cAMP 水準，擾亂細胞訊號（A ✓）；它需要 CaM 才能發揮酵素活性，而 CaM 的活性依賴 Ca²⁺，因此 Ca²⁺ 水準直接影響水腫因子功能（B ✓）。兩個結論均成立，故選 D。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'Which of the following is always true of hormones?',
+    opts:['A) Hormones always bind membrane bound receptors','B) Hormones elicit specific cellular responses','C) Hormones are secreted from a gland via a robust network of ducts','D) The release of hormones is influenced by adrenal receptors','E) All of the above are true'],
+    ans:1,
+    exp:'激素的定義特徵是引發特定細胞反應（B ✓）——只有表達相應受體的細胞才會響應。A ✗（類固醇激素與核受體結合）；C ✗（內分泌腺直接分泌入血，無管道）；D ✗（並非所有激素都受腎上腺素受體調控）。'
+  },
+  {
+    chapter:'ch82', label:'生化82',
+    q:'The phosphoinositide pathway produces which three second messengers?',
+    opts:['A) cAMP, GTP, Ca²⁺','B) IP₃, DAG and Ca²⁺','C) PIP₂, IP₃, cAMP','D) DAG, PKC, Ca²⁺','E) IP₃, cGMP, DAG'],
+    ans:1,
+    exp:'磷脂醯肌醇信號途徑：PLC 切割 PIP₂ → IP₃ 和 DAG。IP₃ 促進 ER 釋放 Ca²⁺。因此三種第二訊使為 IP₃、DAG 和 Ca²⁺。三者分別活化下游效應子（PKC 需要 DAG + Ca²⁺）。'
+  },
+
+  // ── 生化81 / Chapter 8 ──────────────────────────────────────
+  {
+    chapter:'ch81', label:'生化81',
+    q:'A ligand binds to a transmembrane protein. This causes a conformational change in the protein that is detected by an intracellular protein. The intracellular protein is an enzyme that adds phosphate groups to target proteins. The phosphorylated proteins cause a physiological change within the cell. This is an example of',
+    opts:['A) A metabolic pathway','B) Homeostasis','C) A signal transduction pathway','D) An allosteric inhibition pathway'],
+    ans:2,
+    exp:'訊號傳遞路徑（signal transduction pathway）是指胞外訊號（第一訊使）→ 受體 → 胞內傳遞（含酵素、第二訊使等）→ 細胞反應的整個過程。此題描述了配體→受體→激酶→磷酸化靶蛋白→生理反應的完整流程。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which of the following does NOT participate in a signal transduction pathway?',
+    opts:['A) Second messenger','B) First messenger','C) Receptor protein','D) Lipid transporter'],
+    ans:3,
+    exp:'訊號傳遞路徑的核心組分包括第一訊使（配體）、受體、第二訊使、下游蛋白激酶等。脂質轉運蛋白（lipid transporter）負責運輸脂質，並非訊號傳遞路徑的組成成員。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Construct a functional signal transduction pathway by placing the following actors in the correct order:\nA. upstream signaling protein  B. second messenger  C. receptor protein\nD. first messenger  E. target proteins  F. downstream signaling protein',
+    opts:['a. D, E, C, A, B, F','b. C, D, A, B, F, E','c. D, C, A, B, F, E','d. D, C, B, A, F, E'],
+    ans:2,
+    exp:'正確順序：第一訊使（D）→ 受體（C）→ 上游訊號蛋白（A）→ 第二訊使（B）→ 下游訊號蛋白（F）→ 靶蛋白（E）。第一訊使在胞外，受體在膜上，依序向下傳遞直至細胞反應。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'First messengers, but NOT second messengers',
+    opts:['A) Bind to a protein','B) Act as a transcription factor','C) Are located extracellularly','D) Are an allosteric effector'],
+    ans:2,
+    exp:'第一訊使（如激素、神經傳遞物）位於細胞外，負責攜帶來自訊號細胞的信息；第二訊使（如 cAMP、Ca²⁺）則在細胞內產生和發揮作用。兩者均可與蛋白結合（A 非獨有），但只有第一訊使主要位於胞外（C ✓）。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which of the following is an example of a first or second messenger?',
+    opts:['A) Peptide hormone','B) G protein-coupled receptor','C) Protein kinase','D) Cyclic nucleotide phosphodiesterase'],
+    ans:0,
+    exp:'多肽激素（如胰島素、升糖素）是典型的第一訊使——由內分泌腺分泌，透過血液循環傳遞訊號，結合靶細胞表面受體。GPCR 是受體，激酶是轉導蛋白，磷酸二酯酶是調控酵素，皆非訊使本身。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which of the following list includes ONLY first messengers?',
+    opts:['A) Cortisol, insulin, prostaglandins','B) Nitric oxide, estradiol, heme','C) Insulin, glucagon, glucose','D) Ca²⁺, testosterone, protein kinase A'],
+    ans:0,
+    exp:'皮質醇、胰島素和前列腺素均為胞外第一訊使，作用於特定受體。選項 C 中葡萄糖並非傳統第一訊使；D 中 Ca²⁺ 是第二訊使，PKA 是胞內酵素。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Estradiol is secreted by the ovaries, travels through the bloodstream, and interacts with estrogen receptors on breast epithelial cells. In this scenario estradiol is acting through which type of mechanism?',
+    opts:['A) Synacrine','B) Paracrine','C) Endocrine','D) Autocrine'],
+    ans:2,
+    exp:'內分泌（endocrine）信號指激素由分泌腺釋放入血液，遠距離作用於靶細胞。旁分泌（paracrine）作用於鄰近細胞；自分泌（autocrine）作用於分泌細胞本身。雌二醇從卵巢→血液→乳腺是典型的內分泌作用。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'A Western blot analysis of estrogen receptors in ovarian tissues showed ~4× greater protein levels at day 2 vs. day 10 of the estrous cycle. Which of the following may be true?',
+    opts:['A) Estrogen is acting as an endocrine signal in the ovaries','B) Estrogen is acting as an autocrine signal in the ovaries','C) Ovaries only secrete estrogen early in the estrous cycle','D) Ovarian tissue is responsive to estrogen only early in the estrous cycle'],
+    ans:1,
+    exp:'卵巢本身分泌雌激素，而卵巢組織上也有雌激素受體且隨週期改變，表明雌激素同時作用於分泌細胞（卵巢細胞）本身，為自分泌（autocrine）信號模式。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Acetylcholine is a neurotransmitter that stimulates muscle contraction. Acetylcholine is acting as a(n)',
+    opts:['A) Endocrine signal','B) Paracrine signal','C) Autocrine signal','D) Second messenger'],
+    ans:1,
+    exp:'神經傳遞物由突觸前神經元釋放，穿越突觸間隙，作用於突觸後肌肉細胞。靶細胞是「鄰近」的細胞，這是旁分泌（paracrine）訊號的典型例子。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Cyclic GMP is the __________ during vasodilation.',
+    opts:['A) First messenger','B) Second messenger','C) Paracrine signal','D) Activator of nitric oxide synthetase'],
+    ans:1,
+    exp:'血管舒張流程：乙醯膽鹼（第一訊使）→ 內皮細胞 NOS → NO（旁分泌）→ 平滑肌中鳥苷酸環化酶 → cGMP（第二訊使）→ PKG → 肌肉舒張。cGMP 在此是在靶細胞內產生的第二訊使。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Muscle relaxation in response to nitric oxide would be reduced if a(n) __________ was present.',
+    opts:['A) Stimulator of cGMP phosphodiesterase','B) Inhibitor of protein kinase A','C) Inhibitor of acetylcholine esterase','D) Stimulator of guanylate cyclase'],
+    ans:0,
+    exp:'cGMP 磷酸二酯酶（PDE）負責降解 cGMP。若 PDE 被刺激，cGMP 更快被分解，訊號減弱，肌肉無法充分舒張。威而鋼（Sildenafil）的機制正好相反——抑制 PDE5 使 cGMP 積累，維持血管舒張。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'The levels of the second messenger involved in vasodilation are increased by __________ and decreased by __________.',
+    opts:['A) cGMP cyclase; guanylate phosphodiesterase','B) Guanylate phosphodiesterase; cGMP cyclase','C) Guanylate cyclase; cGMP phosphodiesterase','D) cGMP phosphodiesterase; guanylate cyclase'],
+    ans:2,
+    exp:'cGMP 由鳥苷酸環化酶（guanylate cyclase）從 GTP 合成，使 cGMP 增加；由 cGMP 磷酸二酯酶（cGMP PDE）水解降解，使 cGMP 降低。兩者共同維持 cGMP 動態平衡。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which class of proteins interacts with a heterotrimeric intracellular protein?',
+    opts:['A) Receptor tyrosine kinases','B) TNF receptor family','C) G protein-coupled receptors','D) Nuclear transmembrane proteins'],
+    ans:2,
+    exp:'G 蛋白偶聯受體（GPCR）是一類 7 次跨膜蛋白，其細胞質側與異三聚體 G 蛋白（Gαβγ）偶聯。配體結合引起受體構型改變，催化 Gα 的 GDP→GTP 交換，啟動下游訊號。RTK 不與 G 蛋白互作（A ✗）。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Ligand binding causes which of the following to form trimers?',
+    opts:['A) Tumor necrosis factor receptors','B) Receptor tyrosine kinases','C) G protein-coupled receptors','D) Nicotinic acetylcholine receptors'],
+    ans:0,
+    exp:'TNF（腫瘤壞死因子）受體以三聚體形式存在，TNF 配體本身也是三聚體。配體結合使三個受體單元聚合，招募胞內 DD（death domain）蛋白，啟動凋亡或 NF-κB 生存路徑。RTK 形成二聚體（B ✗）。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'What characteristic is true for both RTKs and GPCRs?',
+    opts:['A) The receptor binds to intracellular proteins only when activated','B) When activated, the receptor has enzymatic activity','C) The receptor transmits ions','D) The receptor undergoes a conformational change on activation'],
+    ans:3,
+    exp:'RTK 和 GPCR 活化的共同機制：配體結合引起受體蛋白的構型（conformation）改變，進而傳遞訊號。RTK 活化時具酪胺酸激酶活性（B 為 RTK 特有）；GPCR 本身不具酶活性；兩者均不傳遞離子（C ✗）。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which of the following is a GTPase?',
+    opts:['A) Gβ','B) Gγ','C) Gsα','D) Gβγ'],
+    ans:2,
+    exp:'Gα 亞基（包括 Gsα）具有固有 GTPase 活性，能自發將結合的 GTP 水解為 GDP，從而終止自身的活化狀態（「自我關閉」機制）。GTPase 活化蛋白（GAP）可加速此過程。Gβγ 複合體無 GTPase 活性。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'The α subunit of trimeric G proteins can function to',
+    opts:['A) Regulate ion channels','B) Activate adenylate cyclase','C) Inhibit phospholipase A','D) Inhibit phosphodiesterase'],
+    ans:1,
+    exp:'Gsα-GTP 與腺苷酸環化酶（AC）結合，刺激 AC 活性，增加 cAMP 合成，這是 β-腎上腺素受體信號路徑的核心步驟。（Giα 抑制 AC；Gqα 活化 PLC；Gβγ 可調節離子通道——但本題問的是 α 亞基的代表功能。）'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Levels of diacylglycerol increase in a cell on binding of a ligand to a taste receptor. Which trimeric G protein subunit is most likely to be bound to GTP?',
+    opts:['A) Gqα','B) Gtα','C) Gβγ','D) Giα'],
+    ans:0,
+    exp:'DAG 是磷脂酶 C（PLC）切割 PIP₂ 的產物。活化 PLC 的 G 蛋白亞基是 Gqα——當 Gq 型受體被配體激活，Gqα 結合 GTP 並活化 PLC-β，分解 PIP₂ 生成 IP₃ 和 DAG。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which of the following is activated or increased in a liver cell on exposure to either glucagon or epinephrine?',
+    opts:['A) GTPqα','B) Phospholipase C','C) cAMP','D) DAG'],
+    ans:2,
+    exp:'升糖素和腎上腺素均透過 GPCR（Gsα 路徑）活化腺苷酸環化酶，增加 cAMP 合成。cAMP 活化 PKA，磷酸化糖原磷酸化酶激酶（促進糖原分解）和抑制糖原合成酶，使血糖升高。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'An estrogen-dependent breast cancer cell line grown without estrogen but with bisphenol A (found in polycarbonate plastics) shows higher cell proliferation than with estrogen. A possible explanation is that bisphenol A',
+    opts:['A) Inhibits the binding of estrogen to the estrogen receptor','B) Is an agonist of the estrogen receptor','C) Inhibits adenylate cyclase','D) Is toxic to the cell line'],
+    ans:1,
+    exp:'雙酚 A 在沒有雌激素的情況下仍能促進依賴雌激素的細胞增殖，表明它能活化雌激素受體，作為雌激素的促效劑（agonist）。這也是為何雙酚 A 被列為環境內分泌干擾物（EDC）。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which of the following compounds is a pharmaceutical adrenergic receptor agonist?',
+    opts:['A) Dopamine','B) Metoprolol','C) Norepinephrine','D) Clonidine'],
+    ans:3,
+    exp:'可樂定（clonidine）是 α₂-腎上腺素受體的選擇性促效劑（agonist），常用於治療高血壓。美托洛爾是 β₁-受體拮抗劑（antagonist）。題目強調「藥理」（pharmaceutical）試劑，可樂定最為典型。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'When bound to GTP, Gsα obtains a conformation that promotes interaction with',
+    opts:['A) Adenylate cyclase','B) PKA','C) The G protein-coupled receptor','D) Phospholipase C'],
+    ans:0,
+    exp:'Gsα 結合 GTP 後構型改變，形成能與腺苷酸環化酶（AC）高親和力結合的形態，進而刺激 AC 合成 cAMP。PKA 是 cAMP 的下游效應子，非 Gsα-GTP 的直接互作對象。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'When the regulatory subunit of PKA is bound to cAMP,',
+    opts:['A) It dissociates into monomers','B) The pseudosubstrate is phosphorylated','C) It cannot bind to catalytic subunit of PKA','D) It is part of a tetramer'],
+    ans:2,
+    exp:'PKA 靜息狀態為 R₂C₂ 四聚體，R 亞基上的偽底物佔據 C 亞基的活化位點。cAMP 與 R 亞基結合後，R 構型改變，R₂ 和 2C 解離。解離後的 R 亞基不再能結合 C 亞基（C ✓），C 亞基游離並磷酸化靶蛋白。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'When PKA is inactive, which of the following is true?',
+    opts:['A) The pseudosubstrate of the PKA regulatory subunits is bound in the active site of the catalytic subunits','B) The regulatory subunits are bound by cAMP','C) The regulatory subunits are bound by GTP','D) ATP is unable to bind the catalytic subunits'],
+    ans:0,
+    exp:'PKA 的自我抑制機制：R 亞基含有類似底物序列的「偽底物（pseudosubstrate）」片段，在無 cAMP 時插入 C 亞基的活化位點，阻止底物進入，保持激酶非活化狀態。此為典型的自我抑制（autoinhibition）機制。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Liver cells exposed to glucagon showed changes in metabolic enzyme activity. Enzymes with changed activity were analyzed for covalent modification. Which result was likely observed?',
+    opts:['A) Enzymes with lower activity were not phosphorylated','B) Enzymes with higher activity were methylated','C) Enzymes with altered activity (higher or lower) were phosphorylated','D) Enzymes with altered activity were methylated'],
+    ans:2,
+    exp:'升糖素→cAMP→PKA 路徑活化後，PKA 透過磷酸化調控酵素活性：有些磷酸化後活性升高（如磷酸化酶激酶），有些降低（如糖原合成酶）。活性改變的酵素均發生了磷酸化的共價修飾（C ✓）。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'If protein kinase A is activated in a liver cell in response to glucagon binding to the β₂-adrenergic receptor, which of the following will result?',
+    opts:['A) Glycogen synthesis will be turned on','B) Glycogen degradation will be turned on','C) Glucose synthesis will be turned off','D) GLUT1 expression will be upregulated'],
+    ans:1,
+    exp:'PKA 磷酸化糖原磷酸化酶激酶（GPK）→ 磷酸化糖原磷酸化酶 → 活化，促進糖原分解；同時磷酸化糖原合成酶 → 抑制。結果是糖原分解（glycogenolysis）開啟，血糖升高以滿足能量需求。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which of the following prevents GPCR from reassociating with the Gαβγ complex?',
+    opts:['A) β-arrestin','B) GTPase activating protein','C) cAMP phosphodiesterase','D) RGS'],
+    ans:0,
+    exp:'GRK 磷酸化活化的 GPCR → β-arrestin 結合磷酸化受體 → 受體構型改變，不再能與 G 蛋白有效偶聯，阻止信號重新啟動（脫敏化機制）。β-arrestin 同時招募網格蛋白，促進受體內吞（internalization）。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which scenario would allow β-arrestin to bind to the GPCR?',
+    opts:['A) βARK is internalized into the endosome','B) The receptor is phosphorylated','C) Gα is bound to GDP','D) The regulatory subunit of β-arrestin is removed'],
+    ans:1,
+    exp:'β-arrestin 的結合需要 GPCR 先被 GRK（如 βARK）磷酸化。磷酸化改變受體胞內端的靜電環境，暴露 β-arrestin 的結合位點。未磷酸化的受體不能高親和力結合 β-arrestin。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Place the following steps in proper order:\nA. Phosphorylation of RTK cytoplasmic tails\nB. Activation of downstream signaling pathways\nC. Ligand binding, receptor dimerization, and kinase activation\nD. Protein binding to RTK phosphotyrosines and phosphorylation of target proteins',
+    opts:['a. C, D, A, B','b. C, B, A, D','c. C, A, D, B','d. B, C, A, D'],
+    ans:2,
+    exp:'RTK 活化順序：配體結合→受體二聚化→激酶活化（C）→ RTK 胞質端酪胺酸自磷酸化（A）→ 含 SH2 域蛋白結合磷酸酪胺酸，磷酸化靶蛋白（D）→ 下游路徑活化（B）。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which of the following proteins contains an SH3 domain?',
+    opts:['A) Growth factor receptor-bound 2 (GRB2)','B) Phosphoinositide-3 kinase (PI-3K)','C) SOS protein','D) RasGAP'],
+    ans:0,
+    exp:'GRB2 同時含有 1 個 SH2 域（結合磷酸酪胺酸）和 2 個 SH3 域（結合 SOS 的富脯胺酸序列），作為接合蛋白將活化的 RTK 連接到 Ras-MAPK 路徑：RTK-pTyr → GRB2(SH2) → GRB2(SH3) → SOS → Ras-GTP。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'If GRB2 were truncated so that the N-terminal domain was missing, the truncated protein would be unable to bind the',
+    opts:['A) Phosphorylated Tyr of the SOS protein','B) Phosphorylated Tyr of the RTK substrate','C) Proline-rich sequence of the SOS protein','D) Protein-rich sequence of the RTK substrate'],
+    ans:2,
+    exp:'GRB2 結構：N-SH3—SH2—C-SH3。N 端 SH3 域負責結合 SOS 的富脯胺酸（proline-rich）序列。若 N 端截去，GRB2 雖仍能透過 SH2 域結合 RTK 的磷酸 Tyr，但無法招募 SOS，Ras 無法活化，下游 MAPK 路徑中斷。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which of the following is true of a recessive oncogene mutation but NOT a dominant oncogene mutation?',
+    opts:['A) It results in a disease phenotype any time the mutation is present','B) It results in a disease phenotype only when both copies of the mutated oncogene are present','C) It is a gain-of-function mutation','D) It is a mutation in a tumor suppressor gene'],
+    ans:1,
+    exp:'隱性致癌基因突變（即抑癌基因如 BRCA1、RB1 的功能喪失突變）：需要兩個等位基因均喪失功能（Knudson 二次打擊學說），疾病才會發生。顯性致癌基因突變（如 RAS）：只需一個等位基因突變即可（功能獲得性突變，C 為顯性特徵）。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'The insulin receptor is a type of',
+    opts:['A) G protein-linked receptor','B) Receptor tyrosine kinase','C) Oncogene','D) MEK'],
+    ans:1,
+    exp:'胰島素受體是一種預先形成的 α₂β₂ 異四聚體受體酪胺酸激酶（RTK）。α 亞基（胞外）結合胰島素；β 亞基（跨膜+胞內）含酪胺酸激酶域。胰島素結合後活化激酶，啟動 IRS 磷酸化等下游事件。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'On binding of an insulin molecule to the insulin receptor, a conformational change occurs that',
+    opts:['A) Increases the affinity of a second insulin binding site','B) Causes the dimerization of the receptor','C) Brings the L1 region of the α subunit closer to the membrane','D) Stimulates tyrosine autophosphorylation in the β subunits'],
+    ans:3,
+    exp:'胰島素結合使兩個 β 亞基靠近，胞內酪胺酸激酶域交叉互磷酸化（自磷酸化），活化激酶。進一步磷酸化 IRS-1/2 等接合蛋白，啟動 PI3K 和 MAPK 路徑，分別促進葡萄糖攝取和基因表現。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Construct a functional insulin signaling pathway:\nA: Phosphorylation of β subunits of the insulin receptor\nB: Insulin binds to α subunits\nC: PI-3K is activated\nD: IRS is phosphorylated',
+    opts:['a. C, A, B, D','b. B, D, A, C','c. B, A, C, D','d. B, A, D, C'],
+    ans:3,
+    exp:'胰島素受體信號流程：胰島素結合 α 亞基（B）→ β 亞基酪胺酸自磷酸化（A）→ 磷酸化接合蛋白 IRS-1/2（D）→ IRS 磷酸化酪胺酸招募 PI3K 的 SH2 域，活化 PI3K（C）→ PIP₃ → PDK1 → PKB/Akt → GLUT4 膜融合。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'On insulin binding to the insulin receptor, MAP kinase signaling proteins are activated. Which of the following proteins is part of this signaling pathway?',
+    opts:['A) Shc','B) IRS','C) PI-3K','D) GLUT-1'],
+    ans:0,
+    exp:'MAPK 路徑的活化：胰島素受體 → Shc（含 PTB 域的接合蛋白）被磷酸化 → 招募 GRB2 → 招募 SOS → Ras 活化 → Raf → MEK → MAPK → Fos/Jun 等轉錄因子。Shc 是連接 RTK 和 Ras/MAPK 路徑的關鍵接合蛋白。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which of the following occurs after activation of the PI-3K signaling pathway?',
+    opts:['A) Glycogen synthesis rates decrease','B) GRB2 is activated','C) GLUT-1 levels decrease','D) Glucose uptake increases'],
+    ans:3,
+    exp:'PI3K 活化 → PIP₃ → PDK1 → PKB（Akt）→ ① AS160 磷酸化 → GLUT4 囊泡與膜融合，葡萄糖攝取增加；② GSK-3 抑制 → 糖原合成酶活化，糖原合成增加。葡萄糖攝取增加（D）是 PI3K 路徑的直接後果。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'A new protein is discovered that contains a pleckstrin homology (PH) domain. Which of the following is likely to bind to the protein?',
+    opts:['A) PIP₃','B) PI-3K','C) Phosphorylated tyrosines','D) Ca²⁺'],
+    ans:0,
+    exp:'PH（pleckstrin homology）域是一種識別磷脂醯肌醇的蛋白域，特異性結合 PI(3,4,5)P₃（PIP₃）或 PI(4,5)P₂。PI3K 活化後在膜上產生 PIP₃，招募含 PH 域蛋白（如 PDK1、Akt）至膜上並促進活化。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Caspases contain',
+    opts:['A) Phosphorylated tyrosines when activated','B) Death domains','C) An active site cysteine residue','D) SODD'],
+    ans:2,
+    exp:'Caspase（半胱天冬酶）的命名：「Cys」（半胱胺酸）+ 「aspartate」（天冬胺酸）+ ase。活化位點含保守的半胱胺酸（Cys）殘基，負責切割靶底物天冬胺酸 C 端的肽鍵。死亡域是受體的結構域，SODD 是抑制蛋白。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Caspase 3 is responsible for',
+    opts:['A) Activating caspase 8','B) Phosphorylating Fas','C) Degrading key regulatory molecules','D) Dephosphorylating FasL'],
+    ans:2,
+    exp:'Caspase 3 是「執行者 caspase」（executioner caspase），被啟始 caspase（如 caspase 8）切割活化後，負責切割降解多種細胞結構和調控蛋白，包括 PARP、核纖層蛋白、細胞骨架蛋白等，導致凋亡形態改變。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'If a mutation occurred in SODD that prohibited its interaction with the DD of TNF receptor, the TNF receptor would',
+    opts:['A) No longer form a trimer','B) No longer be able to release TNF-α','C) Bind TRADD, even in the absence of TNF-α','D) Bind NFκB, even in the absence of TNF-α'],
+    ans:2,
+    exp:'SODD 在正常狀態下結合 TNF 受體的 DD，防止受體在無配體時自發信號。若 SODD 功能喪失，DD 持續暴露，即使沒有 TNF-α，TRADD 也會自發結合 DD，啟動下游信號（含凋亡路徑）。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Place the following steps of the apoptotic pathway in proper order:\nA. CASP3 cleavage of cellular proteins\nB. Cleavage of procaspase 8\nC. Cleavage of procaspase 3\nD. Assembly of DD and DED protein complexes',
+    opts:['a. D, C, B, A','b. B, C, A, D','c. D, B, C, A','d. D, C, A, B'],
+    ans:2,
+    exp:'TNF 介導的外源性凋亡路徑：DD 蛋白組裝，招募 FADD（含 DED），形成 DISC（D）→ FADD 招募並切割 procaspase 8，活化 caspase 8（B）→ Caspase 8 切割 procaspase 3（C）→ 活化的 caspase 3 切割降解細胞蛋白（A）。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which of the following acts as a transcription factor in the cell survival pathway activated by TNF-α?',
+    opts:['A) p50:p65 complex','B) NIK:RIP complex','C) IκBα','D) IKK'],
+    ans:0,
+    exp:'NF-κB 轉錄因子以 p50:p65 異二聚體形式存在，被 IκB 扣押在細胞質。TNF-α → TRADD → TRAF2 → NIK → IKK 磷酸化 IκB → IκB 降解 → p50:p65 釋放入核，啟動抗凋亡基因（如 Bcl-2）表現。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Phosphorylation of which of the following is necessary for the increased expression of antiapoptotic genes?',
+    opts:['A) RIP','B) TNF receptor','C) FADD','D) IKK'],
+    ans:3,
+    exp:'IKK（IκB 激酶複合體）磷酸化 IκBα 的 Ser32/Ser36，觸發 IκBα 的泛素化和蛋白酶體降解，釋放 NF-κB（p50:p65）入核，啟動抗凋亡和促炎症基因的轉錄，如 Bcl-2、XIAP 等。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which of the following is true of active NFκB?',
+    opts:['A) It is a dimer','B) It is phosphorylated','C) It is in a complex with a DD','D) It has been proteolytically activated'],
+    ans:0,
+    exp:'NF-κB 以二聚體形式（最常見 p50:p65）發揮轉錄因子功能。活化的 NF-κB（從 IκB 釋放後）本身並無磷酸化需求（IKK 磷酸化的是 IκB 而非 NF-κB 本身）；它是「去抑制」活化，非蛋白酶解活化。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Consider a mutant cell that does not form DISC on TNF signaling. Which of the following would occur if exposed to TNF-α?',
+    opts:['A) Caspase 3 would be activated','B) TNF-α would bind to the TNF receptor','C) Caspase 8 would be activated','D) The cell would undergo apoptosis'],
+    ans:1,
+    exp:'DISC 的形成對 caspase 8 活化至關重要。若無法形成 DISC，caspase 8 不能活化（C ✗），caspase 3 也不能活化（A ✗），細胞不會凋亡（D ✗）。但 TNF-α 與受體的結合是 DISC 形成的上游步驟，此步驟不受影響（B ✓）。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Cell-specific responses to signaling molecules are possible because',
+    opts:['A) Nuclear receptor expression is cell specific','B) Target palindromic DNA sequences are ubiquitous','C) Signaling molecules are hydrophobic and can pass through the plasma membrane','D) Only some cells express gated channels for the signaling molecules'],
+    ans:0,
+    exp:'雖然類固醇激素可自由進入所有細胞，但只有表現相應核受體的細胞才能做出反應。核受體的表現具有細胞和組織特異性（如雌激素受體主要在乳腺、子宮細胞中高度表現），決定了激素作用的靶組織。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which of the following DNA sequences is MOST likely to be bound by a steroid receptor?',
+    opts:['A) AGGAGAACATCATGTTCT','B) AGGAGATAGGAGAACT','C) TTTGATCCAGTTTCCAGT','D) CCCAAGTTCCCAAG'],
+    ans:0,
+    exp:'類固醇受體識別激素反應元件（HRE），典型特徵是回文（palindrome）或反向重複序列。選項 A（AGGAGAAC 和 GTTCTCCT 互補）構成反向重複回文結構，符合 HRE 特徵。類固醇受體常以二聚體形式結合此類對稱序列。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which of the following is a metabolite receptor?',
+    opts:['A) Aldosterone receptor','B) Glucocorticoid receptor','C) Progesterone receptor','D) Thyroid hormone receptor'],
+    ans:3,
+    exp:'代謝物受體（metabolite receptor）的配體來自飲食代謝物（維生素、脂肪酸衍生物等）。甲狀腺激素（T₃/T₄）來源於酪胺酸和碘，是代謝物衍生的核受體配體，其受體 TR 是典型的代謝物受體（屬「核受體超家族 I 型」）。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'The PPARγ-RXRα heterodimer interacts with DNA via',
+    opts:['A) The LXXLL sequences','B) Leucine zipper motifs','C) Zinc finger motifs','D) Basic leucine zipper motifs'],
+    ans:2,
+    exp:'PPAR 和 RXR 均屬核受體超家族，含 C₂H₂ 型鋅指（zinc finger）DNA 結合域，能識別 PPRE（PPAR 反應元件）中的特異序列。鋅指基序是核受體識別 DNA 的通用結構。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Removal of which metal ion would likely alter the structure of the GR DNA-binding domain and preclude it from binding to DNA?',
+    opts:['A) Zn²⁺','B) Mg²⁺','C) Ca²⁺','D) Fe²⁺'],
+    ans:0,
+    exp:'GR 的 DNA 結合域含兩個鋅指結構，每個由 4 個 Cys 殘基配位一個 Zn²⁺ 離子，形成穩定的手指形結構用於識別 DNA 大溝。移除 Zn²⁺ 會破壞鋅指的三維結構，使受體無法正確折疊和結合 DNA。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'A class of proteins that assist other proteins to fold are known as __________ proteins.',
+    opts:['A) Folding assist','B) Proteasome','C) Chaperonin','D) Overseer'],
+    ans:2,
+    exp:'伴侶蛋白（chaperonin）是分子伴侶（chaperone）的一個亞類，透過提供隔離的折疊環境，防止蛋白質非特異性聚集，輔助蛋白質達到正確的三維構象。核受體在無配體時常與 Hsp90（一種伴侶蛋白）結合，保持受體適當構型。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'A response element is',
+    opts:['A) Any protein whose expression is changed in response to a signal','B) A sequence of regulatory DNA','C) A domain of the glucocorticoid receptor that binds DNA','D) A sequence of DNA coding for a steroid or metabolite receptor'],
+    ans:1,
+    exp:'反應元件（response element, RE）是位於靶基因調控區域（啟動子/增強子）中的特定 DNA 序列，能被活化的核受體（或其他轉錄因子）識別和結合，調控下游基因的轉錄。例如糖皮質素反應元件（GRE）被 GR 二聚體識別。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'Which of the following is NOT an expected effect of the binding of the glucocorticoid response element by GR?',
+    opts:['A) Upregulation of annexin I','B) Inhibition of the inflammatory response','C) Upregulation of cyclooxygenase-2','D) Decreased interaction of p65 and p50 of NFκB'],
+    ans:2,
+    exp:'GR 活化的抗炎效應包括：上調抗炎蛋白 annexin I（A ✓）；抑制 NF-κB 信號（D ✓）；整體抑制炎症反應（B ✓）。COX-2 是促炎酶，由 NF-κB 誘導，GR 抑制 NF-κB，因此抑制而非上調 COX-2（C 是不期待的效應）。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'The __________ domain functions as a protein-protein interaction module and is located in the cytoplasmic tail of TNF receptors.',
+    opts:['A) Death','B) SH2','C) SH3','D) RIP'],
+    ans:0,
+    exp:'死亡域（DD, death domain）是一類約 80 胺基酸的蛋白互作模組，存在於 TNF 受體（TNFR1）、Fas 受體等凋亡受體的細胞質尾端，以及 TRADD、FADD 等接合蛋白中。DD 之間的同型互作（DD:DD）是組裝凋亡信號複合體（DISC）的基礎。'
+  },
+  {
+    chapter:'ch81', label:'生化81',
+    q:'The result of TRADD proteins binding to TNF receptors is that',
+    opts:['A) TRADD is phosphorylated','B) An activated adaptor complex is formed','C) Downstream signaling proteins are inactivated','D) TNF is degraded'],
+    ans:1,
+    exp:'TRADD 透過 DD:DD 互作結合 TNFR1 的死亡域，形成活化的接合體平台（adaptor complex）。此平台進一步招募 FADD（走凋亡路徑）或 TRAF2/RIP1（走 NF-κB 生存路徑），決定細胞命運。'
+  }
+];
+
+// ── State ─────────────────────────────────────────────────────────
+let displayedQuestions = [];
+let answered = 0;
+let correct  = 0;
+
+// ── Init ─────────────────────────────────────────────────────────
+document.getElementById('chapter-filter').addEventListener('change', renderQuiz);
+renderQuiz();
+
+function renderQuiz() {
+  const filter = document.getElementById('chapter-filter').value;
+  displayedQuestions = filter === 'all'
+    ? [...ALL_QUESTIONS]
+    : ALL_QUESTIONS.filter(q => q.chapter === filter);
+
+  answered = 0; correct = 0;
+  updateStats();
+
+  const container = document.getElementById('quiz-container');
+  const empty = document.getElementById('empty');
+  const scorebar = document.getElementById('score-bar');
+
+  if (displayedQuestions.length === 0) {
+    container.innerHTML = '';
+    empty.style.display = 'block';
+    scorebar.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  scorebar.style.display = 'block';
+
+  container.innerHTML = displayedQuestions.map((q, i) => buildCard(q, i)).join('');
+}
+
+function buildCard(q, i) {
+  const letters = ['A', 'B', 'C', 'D', 'E'];
+  const optsHTML = q.opts.map((o, j) => `
+    <button class="opt" onclick="answer(${i}, ${j})" id="opt-${i}-${j}" aria-label="選項 ${letters[j]}">
+      <span class="opt-letter">${letters[j]}</span>
+      <span>${o}</span>
+    </button>`).join('');
+
+  return `
+  <div class="q-card" id="card-${i}">
+    <div class="q-meta">
+      <span class="q-num">Q${i+1}</span>
+      <span class="q-chapter">${q.label}</span>
+      <span id="badge-${i}" style="margin-left:auto"></span>
+    </div>
+    <div class="q-text">${q.q.replace(/\n/g, '<br>')}</div>
+    <div class="options" id="opts-${i}">${optsHTML}</div>
+    <div class="explanation" id="exp-${i}">
+      <div class="exp-title">📖 中文詳解</div>
+      ${q.exp}
+    </div>
+  </div>`;
+}
+
+function answer(qIdx, optIdx) {
+  const q = displayedQuestions[qIdx];
+  const optsContainer = document.getElementById(`opts-${qIdx}`);
+
+  // Already answered?
+  if (optsContainer.querySelector('.correct, .wrong')) return;
+
+  answered++;
+  const isCorrect = optIdx === q.ans;
+  if (isCorrect) correct++;
+
+  // Style buttons
+  Array.from(optsContainer.children).forEach((btn, j) => {
+    btn.classList.add('disabled');
+    btn.onclick = null;
+    if (j === q.ans) btn.classList.add(optIdx === j ? 'correct' : 'highlight-correct');
+    else if (j === optIdx && !isCorrect) btn.classList.add('wrong');
+  });
+
+  // Badge
+  const badge = document.getElementById(`badge-${qIdx}`);
+  badge.innerHTML = isCorrect
+    ? '<span class="result-badge badge-correct">✓ Correct</span>'
+    : '<span class="result-badge badge-wrong">✗ Incorrect</span>';
+
+  // Explanation
+  document.getElementById(`exp-${qIdx}`).classList.add('show');
+
+  updateStats();
+}
+
+function updateStats() {
+  document.getElementById('showing-count').textContent = displayedQuestions.length;
+  document.getElementById('answered-count').textContent = answered;
+  document.getElementById('sc-num').textContent = `${correct}/${answered}`;
+  const pct = answered > 0 ? Math.round(correct/answered*100) : 0;
+  document.getElementById('sc-bar').style.width = pct + '%';
+}
+
+
+
+function resetAll() {
+  answered = 0; correct = 0;
+  renderQuiz();
+}
+</script>
+</body>
+</html>
